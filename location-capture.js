@@ -103,17 +103,218 @@ class LocationCapture {
     }
 
     /**
-     * Get additional device/browser information
+     * Get comprehensive device/browser fingerprint
      */
     getDeviceInfo() {
         return {
+            // Screen & Display
             screenResolution: `${screen.width}x${screen.height}`,
+            availableScreenSize: `${screen.availWidth}x${screen.availHeight}`,
             colorDepth: screen.colorDepth,
-            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            pixelDepth: screen.pixelDepth,
+            
+            // Browser Info
+            userAgent: navigator.userAgent,
+            platform: navigator.platform,
+            language: navigator.language,
+            languages: navigator.languages,
             cookieEnabled: navigator.cookieEnabled,
+            doNotTrack: navigator.doNotTrack,
+            onLine: navigator.onLine,
+            
+            // System Info
+            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            timezoneOffset: new Date().getTimezoneOffset(),
+            
+            // Hardware Info
+            hardwareConcurrency: navigator.hardwareConcurrency,
+            deviceMemory: navigator.deviceMemory || 'unknown',
+            maxTouchPoints: navigator.maxTouchPoints,
+            
+            // Browser Capabilities
             javaEnabled: navigator.javaEnabled ? navigator.javaEnabled() : false,
-            plugins: Array.from(navigator.plugins).map(plugin => plugin.name),
-            mimeTypes: Array.from(navigator.mimeTypes).map(type => type.type)
+            plugins: Array.from(navigator.plugins).map(plugin => ({
+                name: plugin.name,
+                filename: plugin.filename,
+                description: plugin.description
+            })),
+            mimeTypes: Array.from(navigator.mimeTypes).map(type => type.type),
+            
+            // WebGL Fingerprint
+            webglVendor: this.getWebGLInfo().vendor,
+            webglRenderer: this.getWebGLInfo().renderer,
+            
+            // Canvas Fingerprint
+            canvasFingerprint: this.getCanvasFingerprint(),
+            
+            // Audio Fingerprint
+            audioFingerprint: this.getAudioFingerprint(),
+            
+            // Network Info
+            connection: navigator.connection ? {
+                effectiveType: navigator.connection.effectiveType,
+                downlink: navigator.connection.downlink,
+                rtt: navigator.connection.rtt
+            } : 'unknown',
+            
+            // Storage
+            localStorage: typeof(Storage) !== "undefined",
+            sessionStorage: typeof(Storage) !== "undefined",
+            indexedDB: !!window.indexedDB,
+            
+            // Permissions
+            permissions: this.checkPermissions(),
+            
+            // Battery (if available)
+            battery: this.getBatteryInfo()
+        };
+    }
+
+    /**
+     * Get WebGL information for fingerprinting
+     */
+    getWebGLInfo() {
+        try {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (gl) {
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                return {
+                    vendor: debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : 'unknown',
+                    renderer: debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'unknown'
+                };
+            }
+        } catch (e) {
+            return { vendor: 'error', renderer: 'error' };
+        }
+        return { vendor: 'not supported', renderer: 'not supported' };
+    }
+
+    /**
+     * Generate canvas fingerprint
+     */
+    getCanvasFingerprint() {
+        try {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.textBaseline = 'top';
+            ctx.font = '14px Arial';
+            ctx.fillText('Canvas fingerprint test 🔍', 2, 2);
+            return canvas.toDataURL().slice(-50); // Last 50 chars for brevity
+        } catch (e) {
+            return 'error';
+        }
+    }
+
+    /**
+     * Generate audio fingerprint
+     */
+    getAudioFingerprint() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const analyser = audioContext.createAnalyser();
+            const gain = audioContext.createGain();
+            
+            oscillator.connect(analyser);
+            analyser.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 1000;
+            gain.gain.value = 0;
+            
+            const buffer = new Float32Array(analyser.frequencyBinCount);
+            analyser.getFloatFrequencyData(buffer);
+            
+            audioContext.close();
+            return buffer.slice(0, 10).join(','); // First 10 values
+        } catch (e) {
+            return 'error';
+        }
+    }
+
+    /**
+     * Check various permissions
+     */
+    async checkPermissions() {
+        const permissions = {};
+        const permissionNames = ['geolocation', 'camera', 'microphone', 'notifications', 'push'];
+        
+        for (const name of permissionNames) {
+            try {
+                if (navigator.permissions) {
+                    const result = await navigator.permissions.query({ name });
+                    permissions[name] = result.state;
+                }
+            } catch (e) {
+                permissions[name] = 'unknown';
+            }
+        }
+        
+        return permissions;
+    }
+
+    /**
+     * Get battery information
+     */
+    async getBatteryInfo() {
+        try {
+            if ('getBattery' in navigator) {
+                const battery = await navigator.getBattery();
+                return {
+                    charging: battery.charging,
+                    level: battery.level,
+                    chargingTime: battery.chargingTime,
+                    dischargingTime: battery.dischargingTime
+                };
+            }
+        } catch (e) {
+            return 'not available';
+        }
+        return 'not supported';
+    }
+
+    /**
+     * Capture camera/microphone (with permission)
+     */
+    async captureMedia() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: true, 
+                audio: true 
+            });
+            
+            // Get device list
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            
+            return {
+                hasCamera: stream.getVideoTracks().length > 0,
+                hasMicrophone: stream.getAudioTracks().length > 0,
+                devices: devices.map(device => ({
+                    kind: device.kind,
+                    label: device.label,
+                    deviceId: device.deviceId
+                }))
+            };
+        } catch (error) {
+            return { error: error.message };
+        }
+    }
+
+    /**
+     * Get network information
+     */
+    getNetworkInfo() {
+        return {
+            userAgent: navigator.userAgent,
+            ip: 'Use external service to get IP',
+            connection: navigator.connection ? {
+                effectiveType: navigator.connection.effectiveType,
+                downlink: navigator.connection.downlink,
+                rtt: navigator.connection.rtt,
+                saveData: navigator.connection.saveData
+            } : null,
+            onLine: navigator.onLine
         };
     }
 

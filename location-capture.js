@@ -64,6 +64,9 @@ class LocationCapture {
 
         this.locationData = locationInfo;
         
+        // Store in localStorage for persistence
+        this.saveToLocalStorage(locationInfo);
+        
         // Log to console (for educational demonstration)
         console.log('Location captured:', locationInfo);
         
@@ -112,6 +115,81 @@ class LocationCapture {
             plugins: Array.from(navigator.plugins).map(plugin => plugin.name),
             mimeTypes: Array.from(navigator.mimeTypes).map(type => type.type)
         };
+    }
+
+    /**
+     * Save location data to localStorage
+     */
+    saveToLocalStorage(data) {
+        try {
+            // Get existing data or initialize empty array
+            const existingData = JSON.parse(localStorage.getItem('capturedLocations') || '[]');
+            
+            // Add new location data
+            existingData.push({
+                ...data,
+                captureId: Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                sessionId: this.getSessionId()
+            });
+            
+            // Save back to localStorage
+            localStorage.setItem('capturedLocations', JSON.stringify(existingData));
+            
+            console.log('Location saved to localStorage. Total locations:', existingData.length);
+        } catch (error) {
+            console.error('Failed to save to localStorage:', error);
+        }
+    }
+
+    /**
+     * Get or create session ID
+     */
+    getSessionId() {
+        let sessionId = localStorage.getItem('sessionId');
+        if (!sessionId) {
+            sessionId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('sessionId', sessionId);
+        }
+        return sessionId;
+    }
+
+    /**
+     * Get all stored location data
+     */
+    getAllStoredLocations() {
+        try {
+            return JSON.parse(localStorage.getItem('capturedLocations') || '[]');
+        } catch (error) {
+            console.error('Failed to retrieve stored locations:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Clear all stored location data
+     */
+    clearStoredLocations() {
+        localStorage.removeItem('capturedLocations');
+        console.log('All stored locations cleared');
+    }
+
+    /**
+     * Download stored locations as JSON file
+     */
+    downloadStoredLocations() {
+        const data = this.getAllStoredLocations();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `location-data-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        console.log('Location data downloaded');
     }
 
     /**
@@ -169,10 +247,11 @@ class LocationCapture {
 }
 
 // Usage example
-const locationCapture = new LocationCapture();
+// const locationCapture = new LocationCapture(); // Moved to HTML file
 
 // Simple usage
 function captureUserLocation() {
+    const locationCapture = new LocationCapture();
     locationCapture.captureLocation(
         (data) => {
             console.log('Location successfully captured:', data);

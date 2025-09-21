@@ -88,6 +88,13 @@
         <button onclick="stopWatching()" id="stopBtn" disabled>⏹️ Stop Tracking</button>
         <button onclick="getDeviceInfo()">📱 Get Device Info</button>
         <button onclick="clearResults()">🗑️ Clear Results</button>
+        
+        <hr style="margin: 20px 0;">
+        <h3>📁 Data Storage Management</h3>
+        <button onclick="viewStoredData()">📋 View Stored Locations</button>
+        <button onclick="downloadData()">💾 Download Data</button>
+        <button onclick="clearStoredData()">🗑️ Clear Stored Data</button>
+        <button onclick="getStorageInfo()">ℹ️ Storage Info</button>
 
         <div id="results"></div>
 
@@ -212,6 +219,47 @@
 
         function clearResults() {
             document.getElementById('results').innerHTML = '';
+        }
+
+        // Storage management functions
+        function viewStoredData() {
+            const storedData = locationCapture.getAllStoredLocations();
+            displayResult({
+                type: 'Stored Location Data',
+                totalLocations: storedData.length,
+                data: storedData.slice(-5) // Show last 5 entries
+            });
+        }
+
+        function downloadData() {
+            locationCapture.downloadStoredLocations();
+            displayResult({
+                type: 'Data Download',
+                message: 'Location data downloaded as JSON file'
+            });
+        }
+
+        function clearStoredData() {
+            const count = locationCapture.getAllStoredLocations().length;
+            locationCapture.clearStoredLocations();
+            displayResult({
+                type: 'Storage Cleared',
+                message: `Cleared ${count} stored location entries`
+            });
+        }
+
+        function getStorageInfo() {
+            const storedData = locationCapture.getAllStoredLocations();
+            const storageUsed = JSON.stringify(storedData).length;
+            
+            displayResult({
+                type: 'Storage Information',
+                totalEntries: storedData.length,
+                storageUsed: `${(storageUsed / 1024).toFixed(2)} KB`,
+                sessionId: locationCapture.getSessionId(),
+                firstCapture: storedData.length > 0 ? storedData[0].timestamp : 'None',
+                lastCapture: storedData.length > 0 ? storedData[storedData.length - 1].timestamp : 'None'
+            });
         }
 
         // Auto-capture location on page load

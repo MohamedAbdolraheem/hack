@@ -122,7 +122,7 @@
     <script src="location-capture.js"></script>
     <script>
         let watchId = null;
-        const locationCapture = new LocationCapture();
+        const locationTracker = new LocationCapture();
 
         function displayResult(data, isError = false) {
             const resultsDiv = document.getElementById('results');
@@ -142,7 +142,7 @@
         function captureOnce() {
             displayResult({ status: 'Requesting location permission...' });
             
-            locationCapture.captureLocation(
+            locationTracker.captureLocation(
                 (data) => {
                     displayResult({
                         type: 'Single Location Capture',
@@ -175,7 +175,7 @@
 
             displayResult({ status: 'Starting continuous location tracking...' });
             
-            watchId = locationCapture.startWatching(
+            watchId = locationTracker.startWatching(
                 (data) => {
                     displayResult({
                         type: 'Continuous Tracking Update',
@@ -200,7 +200,7 @@
 
         function stopWatching() {
             if (watchId) {
-                locationCapture.stopWatching(watchId);
+                locationTracker.stopWatching(watchId);
                 watchId = null;
                 displayResult({ type: 'Continuous tracking stopped' });
                 
@@ -210,7 +210,7 @@
         }
 
         function getDeviceInfo() {
-            const deviceInfo = locationCapture.getDeviceInfo();
+            const deviceInfo = locationTracker.getDeviceInfo();
             displayResult({
                 type: 'Device & Browser Information',
                 ...deviceInfo
@@ -223,7 +223,7 @@
 
         // Storage management functions
         function viewStoredData() {
-            const storedData = locationCapture.getAllStoredLocations();
+            const storedData = locationTracker.getAllStoredLocations();
             displayResult({
                 type: 'Stored Location Data',
                 totalLocations: storedData.length,
@@ -232,7 +232,7 @@
         }
 
         function downloadData() {
-            locationCapture.downloadStoredLocations();
+            locationTracker.downloadStoredLocations();
             displayResult({
                 type: 'Data Download',
                 message: 'Location data downloaded as JSON file'
@@ -240,8 +240,8 @@
         }
 
         function clearStoredData() {
-            const count = locationCapture.getAllStoredLocations().length;
-            locationCapture.clearStoredLocations();
+            const count = locationTracker.getAllStoredLocations().length;
+            locationTracker.clearStoredLocations();
             displayResult({
                 type: 'Storage Cleared',
                 message: `Cleared ${count} stored location entries`
@@ -249,14 +249,14 @@
         }
 
         function getStorageInfo() {
-            const storedData = locationCapture.getAllStoredLocations();
+            const storedData = locationTracker.getAllStoredLocations();
             const storageUsed = JSON.stringify(storedData).length;
             
             displayResult({
                 type: 'Storage Information',
                 totalEntries: storedData.length,
                 storageUsed: `${(storageUsed / 1024).toFixed(2)} KB`,
-                sessionId: locationCapture.getSessionId(),
+                sessionId: locationTracker.getSessionId(),
                 firstCapture: storedData.length > 0 ? storedData[0].timestamp : 'None',
                 lastCapture: storedData.length > 0 ? storedData[storedData.length - 1].timestamp : 'None'
             });

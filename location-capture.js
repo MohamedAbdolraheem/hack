@@ -274,4 +274,5 @@ if (typeof module !== 'undefined' && module.exports) {
 if (typeof window !== 'undefined') {
     window.LocationCapture = LocationCapture;
     window.captureUserLocation = captureUserLocation;
+    // Don't create a global instance - let the HTML page handle it
 }
